@@ -20,12 +20,12 @@
 </head>
 <body>
     <h1>Bitcoin Price Guess Game</h1>
-    <p>Current Bitcoin Price: ${{ bitcoin_price }}</p>
+    <p>Current Bitcoin Price: S${{ bitcoin_price }}</p>
 
     <h2>Submit Your Guess</h2>
     <form id="guessForm">
-        <input type="text" name="email" id="email" placeholder="Your Email ID" required>
-        <input type="number" name="guess" id="guess" placeholder="Your Price Guess" step="0.01" required>
+        <input type="text" name="email" id="email" placeholder="Your OKG Email Username" required>
+        <input type="number" name="guess" id="guess" placeholder="Your Price Guess" step="0" required>
         <button type="submit">Submit Guess</button>
     </form>
     
@@ -45,8 +45,8 @@
             <tr>
                 <td>{{ loop.index }}</td>
                 <td>{{ entry.email }}</td>
-                <td>${{ "%.2f" | format(entry.guess) }}</td>
-                <td>${{ "%.2f" | format(entry.difference) }}</td>
+                <td>S${{ "%d" | format(entry.guess) }}</td>
+                <td>S${{ "%d" | format(entry.difference) }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -92,6 +92,7 @@
                     console.error("Error fetching leaderboard:", error);
                 });
         }
+        
     </script>
 </body>
 </html>

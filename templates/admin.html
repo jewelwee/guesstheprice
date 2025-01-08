@@ -7,6 +7,14 @@
     <h1>Admin Controls</h1>
 
     <p>Leaderboard Entries: <span id="leaderboardCount">Loading...</span></p>
+
+    <!-- Input for removing a guess -->
+    <h3>Remove Guess by Email</h3>
+    <form id="removeGuessForm">
+        <input type="text" id="removeEmail" placeholder="Enter Email ID" required>
+        <button type="submit">Remove Guess</button>
+    </form>
+
     <form action="/admin" method="post">
         <button name="action" value="clear_leaderboard">Clear Leaderboard</button>
     </form>
@@ -15,6 +23,11 @@
 
     <button id="startButton">Start Submissions</button>
     <button id="pauseButton">Pause Submissions</button>
+
+    <!-- Pause and Resume Bitcoin Fetching -->
+    <h3>Bitcoin Price Fetching Controls</h3>
+    <button id="pauseBitcoinButton">Pause Bitcoin Fetching</button>
+    <button id="resumeBitcoinButton">Resume Bitcoin Fetching</button>
 
     <script>
         // Fetch and update the leaderboard count
@@ -59,6 +72,53 @@
                 .then(data => {
                     alert(data.message);
                     updateSubmissionStatus();
+                });
+        });
+
+        // Handle removal of a guess
+        document.getElementById("removeGuessForm").addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const emailToRemove = document.getElementById("removeEmail").value;
+
+            fetch("/remove_guess", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `email=${emailToRemove}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Notify the user
+                updateLeaderboardCount(); // Refresh the leaderboard count
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+
+        // Pause Bitcoin Fetching
+        document.getElementById("pauseBitcoinButton").addEventListener("click", () => {
+            fetch("/pause_bitcoin_fetch", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message); // Notify the user
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+
+        // Resume Bitcoin Fetching
+        document.getElementById("resumeBitcoinButton").addEventListener("click", () => {
+            fetch("/resume_bitcoin_fetch", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message); // Notify the user
+                })
+                .catch(error => {
+                    console.error("Error:", error);
                 });
         });
 
