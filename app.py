@@ -27,12 +27,17 @@ def home():
 
 @app.route("/submit_guess", methods=["POST"])
 def submit_guess():
-    email = request.form.get("email")
-    guess = float(request.form.get("guess", 0))
+    data = request.get_json()  # Parse JSON payload
+    email = data.get("email")
+    guess = data.get("guess")
 
-    # Add guess to leaderboard
-    GUESSES.append({"email": email, "guess": guess, "difference": abs(guess - BITCOIN_PRICE)})
-    return jsonify({"message": "Guess submitted!"})
+    if email and guess is not None:
+        guess = float(guess)
+        # Add guess to the leaderboard
+        GUESSES.append({"email": email, "guess": guess, "difference": abs(guess - BITCOIN_PRICE)})
+        return jsonify({"message": "Guess submitted successfully!"})
+    else:
+        return jsonify({"message": "Invalid input!"}), 400
 
 @app.route("/leaderboard")
 def leaderboard():

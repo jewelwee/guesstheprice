@@ -2,14 +2,95 @@
 <html>
 <head>
     <title>Bitcoin Guess Game</title>
+    <style>
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+    </style>
 </head>
 <body>
     <h1>Bitcoin Price Guess Game</h1>
     <p>Current Bitcoin Price: ${{ bitcoin_price }}</p>
-    <form action="/submit_guess" method="post">
-        <input type="email" name="email" placeholder="Your Email" required>
-        <input type="number" name="guess" placeholder="Your Price Guess" step="0.01" required>
+
+    <h2>Submit Your Guess</h2>
+    <form id="guessForm">
+        <input type="email" name="email" id="email" placeholder="Your Email" required>
+        <input type="number" name="guess" id="guess" placeholder="Your Price Guess" step="0.01" required>
         <button type="submit">Submit Guess</button>
     </form>
+
+    <h2>Leaderboard</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Email</th>
+                <th>Guess</th>
+                <th>Difference</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboard">
+            {% for entry in leaderboard %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ entry.email }}</td>
+                <td>${{ "%.2f" | format(entry.guess) }}</td>
+                <td>${{ "%.2f" | format(entry.difference) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        document.getElementById("guessForm").addEventListener("submit", function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const email = document.getElementById("email").value;
+            const guess = document.getElementById("guess").value;
+
+            fetch("/submit_guess", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // Ensure JSON content type
+                },
+                body: JSON.stringify({ email, guess }), // Send JSON payload
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Notify the user
+                if (data.message === "Guess submitted successfully!") {
+                    updateLeaderboard(); // Refresh the leaderboard
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+
+
+        function updateLeaderboard() {
+            fetch("/")
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, "text/html");
+                    const newLeaderboard = doc.getElementById("leaderboard").innerHTML;
+                    document.getElementById("leaderboard").innerHTML = newLeaderboard;
+                })
+                .catch(error => {
+                    console.error("Error fetching leaderboard:", error);
+                });
+        }
+    </script>
 </body>
 </html>
