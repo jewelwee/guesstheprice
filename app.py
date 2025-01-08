@@ -23,7 +23,9 @@ def fetch_bitcoin_price():
 
 @app.route("/")
 def home():
-    return render_template("index.html", bitcoin_price=BITCOIN_PRICE)
+    # Pass all guesses sorted by their difference
+    sorted_guesses = sorted(GUESSES, key=lambda x: x["difference"])
+    return render_template("index.html", bitcoin_price=BITCOIN_PRICE, leaderboard=sorted_guesses)
 
 @app.route("/submit_guess", methods=["POST"])
 def submit_guess():
@@ -38,6 +40,7 @@ def submit_guess():
         return jsonify({"message": "Guess submitted successfully!"})
     else:
         return jsonify({"message": "Invalid input!"}), 400
+
 
 @app.route("/leaderboard")
 def leaderboard():
