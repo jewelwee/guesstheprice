@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bitcoin Guess Game</title>
+</head>
+<body>
+    <h1>Bitcoin Price Guess Game</h1>
+    <p>Current Bitcoin Price: ${{ bitcoin_price }}</p>
+    <form action="/submit_guess" method="post">
+        <input type="email" name="email" placeholder="Your Email" required>
+        <input type="number" name="guess" placeholder="Your Price Guess" step="0.01" required>
+        <button type="submit">Submit Guess</button>
+    </form>
+</body>
+</html>
