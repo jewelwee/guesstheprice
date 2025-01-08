@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify
 from threading import Thread
 import time
 import requests
+import re
 
 app = Flask(__name__)
 
@@ -30,16 +31,31 @@ def home():
 @app.route("/submit_guess", methods=["POST"])
 def submit_guess():
     data = request.get_json()  # Parse JSON payload
-    email = data.get("email")
+    email = data.get("email").strip()
     guess = data.get("guess")
+
+    # Simple validation for email ID
+    if not re.match(r"^[a-zA-Z0-9._]+$", email):  # Allow alphanumeric, dots, and underscores
+        return jsonify({"message": "Invalid email format!"}), 400
 
     if email and guess is not None:
         guess = float(guess)
-        # Add guess to the leaderboard
-        GUESSES.append({"email": email, "guess": guess, "difference": abs(guess - BITCOIN_PRICE)})
+
+        # Check if email already exists in GUESSES
+        for entry in GUESSES:
+            if entry["email"] == email:
+                # Update the existing entry
+                entry["guess"] = guess
+                entry["difference"] = abs(guess - BITCOIN_PRICE)
+                break
+        else:
+            # Add a new entry if email not found
+            GUESSES.append({"email": email, "guess": guess, "difference": abs(guess - BITCOIN_PRICE)})
+
         return jsonify({"message": "Guess submitted successfully!"})
     else:
         return jsonify({"message": "Invalid input!"}), 400
+
 
 
 @app.route("/leaderboard")
